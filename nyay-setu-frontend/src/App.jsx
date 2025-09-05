@@ -7,6 +7,7 @@ import Login from './components/Login.jsx';
 import Register from './components/Register.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import CaseListComponent from './components/CaseListComponent.jsx';
 
 function App() {
     return (
@@ -23,6 +24,10 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     {/* Add other protected routes here */}
                 </Route>
+                <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/cases" element={<CaseListComponent />} /> {/* 2. Add the new route */}
+            </Route>
             </Routes>
         </Router>
     );
