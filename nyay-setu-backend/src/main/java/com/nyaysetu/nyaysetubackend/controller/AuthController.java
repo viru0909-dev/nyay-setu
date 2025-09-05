@@ -11,6 +11,7 @@ import com.nyaysetu.nyaysetubackend.dto.LoginRequest;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final AuthService authService;

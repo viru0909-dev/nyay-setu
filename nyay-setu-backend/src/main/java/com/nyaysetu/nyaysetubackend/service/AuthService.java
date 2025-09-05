@@ -47,6 +47,9 @@ public class AuthService {
     }
 
     public String login(LoginRequest req) {
+
+        System.out.println("Attempting to authenticate user: " + req.getEmail());
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         req.getEmail(),
