@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -13,7 +15,7 @@ const Login = () => {
         try {
             const response = await authService.login(email, password);
             if (response.data.token) {
-                localStorage.setItem('token', response.data.token);
+                login(response.data.token);
                 navigate('/dashboard'); // Redirect to dashboard on successful login
             }
         } catch (err) {
@@ -50,5 +52,6 @@ const Login = () => {
         </div>
     );
 };
+
 
 export default Login;

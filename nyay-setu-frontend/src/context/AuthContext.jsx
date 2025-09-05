@@ -6,18 +6,28 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
             const decodedToken = jwtDecode(token);
-            // The roles are in the 'scope' or 'roles' claim in your JWT
-            // Check your JWT structure at jwt.io to be sure. It's often 'sub' for subject/email and 'scope' for roles.
             setUser({
                 email: decodedToken.sub,
-                role: decodedToken.scope, // Adjust if your role claim is named differently
+                role: decodedToken.scope,
+                fullName: decodedToken.fullName, // <-- Add the full name here
             });
         }
     }, []);
+
+    const login = (token) => {
+        localStorage.setItem('token', token);
+        const decodedToken = jwtDecode(token);
+        setUser({
+            email: decodedToken.sub,
+            role: decodedToken.scope,
+            fullName: decodedToken.fullName,
+        });
+    };
 
     const logout = () => {
         localStorage.removeItem('token');
@@ -25,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, logout }}>
+        <AuthContext.Provider value={{ user, login, logout }}> {/* Add login here */}
             {children}
         </AuthContext.Provider>
     );
