@@ -69,4 +69,9 @@ public class CaseService {
 
         return caseRepository.save(newCase);
     }
+
+    public Case findCaseById(Long caseId) {
+        return caseRepository.findById(caseId)
+                .orElseThrow(() -> new RuntimeException("Case not found with id: " + caseId));
+    }
 }

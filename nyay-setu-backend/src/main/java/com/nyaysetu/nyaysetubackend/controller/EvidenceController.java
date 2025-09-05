@@ -21,7 +21,10 @@ public class EvidenceController {
     }
 
     @PostMapping("/upload")
-    @PreAuthorize("isAuthenticated()") // Any logged-in user can upload
+    @PreAuthorize("@caseService.findCaseById(#caseId).client.email == authentication.name or " +
+            "@caseService.findCaseById(#caseId).lawyer?.email == authentication.name or " +
+            "@caseService.findCaseById(#caseId).judge?.email == authentication.name")
+
     public ResponseEntity<?> uploadEvidence(@RequestParam("file") MultipartFile file,
                                             @RequestParam("caseId") Long caseId) {
         try {
