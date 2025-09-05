@@ -31,6 +31,13 @@ public class CaseController {
         return ResponseEntity.ok(cases);
     }
 
+    @GetMapping("/my-cases")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<List<CaseDto>> getCurrentUserCases() {
+        List<CaseDto> cases = caseService.findCasesForCurrentUser();
+        return ResponseEntity.ok(cases);
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Case> createCase(@Valid @RequestBody CreateCaseRequest request) {

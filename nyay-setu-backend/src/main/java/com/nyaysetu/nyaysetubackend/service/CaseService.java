@@ -35,6 +35,18 @@ public class CaseService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<CaseDto> findCasesForCurrentUser() {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User client = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userEmail));
+
+        return caseRepository.findByClientId(client.getId())
+                .stream()
+                .map(CaseDto::fromEntity) // Convert each Case to a CaseDto
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public Case createCase(CreateCaseRequest request) {
