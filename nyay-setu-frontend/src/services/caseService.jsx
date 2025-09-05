@@ -42,8 +42,18 @@ const getMyCases = () => {
     });
 };
 
+const assignLawyer = (caseId, lawyerId) => {
+    const token = localStorage.getItem('token');
+    return axios.put(`${API_URL}/${caseId}/assign-lawyer`, { lawyerId }, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+};
+
 export default {
     getAllCases,
     createCase,
     getMyCases,
+    assignLawyer,
 };

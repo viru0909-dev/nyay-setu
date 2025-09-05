@@ -4,24 +4,32 @@ import com.nyaysetu.nyaysetubackend.model.Case;
 import com.nyaysetu.nyaysetubackend.model.CaseStatus;
 import java.time.LocalDateTime;
 
-// Using a record is a concise way to create an immutable DTO
 public record CaseDto(
         Long id,
         String caseNumber,
         String description,
         CaseStatus status,
         LocalDateTime createdAt,
-        String clientName // We only need the client's name, not the whole object
+        String clientName,
+        String lawyerName, // <-- ADD THIS FIELD
+        String judgeName   // <-- ADD THIS FIELD
 ) {
-    // A helper method to easily convert a Case entity to a CaseDto
     public static CaseDto fromEntity(Case caseEntity) {
+        // Safely get the lawyer's name, or return "Not Assigned" if null
+        String lawyerName = (caseEntity.getLawyer() != null) ? caseEntity.getLawyer().getFullName() : "Not Assigned";
+
+        // Safely get the judge's name, or return "Not Assigned" if null
+        String judgeName = (caseEntity.getJudge() != null) ? caseEntity.getJudge().getFullName() : "Not Assigned";
+
         return new CaseDto(
                 caseEntity.getId(),
                 caseEntity.getCaseNumber(),
                 caseEntity.getDescription(),
                 caseEntity.getStatus(),
                 caseEntity.getCreatedAt(),
-                caseEntity.getClient().getFullName() // Safely get the client's name
+                caseEntity.getClient().getFullName(),
+                lawyerName, // <-- POPULATE THE NEW FIELD
+                judgeName   // <-- POPULATE THE NEW FIELD
         );
     }
 }
