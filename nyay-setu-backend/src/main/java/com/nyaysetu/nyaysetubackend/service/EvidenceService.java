@@ -12,6 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import com.nyaysetu.nyaysetubackend.dto.EvidenceDto;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EvidenceService {
@@ -26,6 +29,16 @@ public class EvidenceService {
         this.fileStorageService = fileStorageService;
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<EvidenceDto> findEvidenceByCaseId(Long caseId) {
+        // Here you could add extra security to check if the current user
+        // is actually part of this case, but for now we'll keep it simple.
+        return evidenceRepository.findByLegalCaseId(caseId)
+                .stream()
+                .map(EvidenceDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Transactional

@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.nyaysetu.nyaysetubackend.dto.EvidenceDto;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/evidence")
@@ -28,5 +30,12 @@ public class EvidenceController {
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/by-case/{caseId}")
+    @PreAuthorize("isAuthenticated()") // For now, any authenticated user can see evidence
+    public ResponseEntity<List<EvidenceDto>> getEvidenceForCase(@PathVariable Long caseId) {
+        List<EvidenceDto> evidenceList = evidenceService.findEvidenceByCaseId(caseId);
+        return ResponseEntity.ok(evidenceList);
     }
 }
