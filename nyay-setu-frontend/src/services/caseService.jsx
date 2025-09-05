@@ -19,6 +19,16 @@ const getAllCases = () => {
     });
 };
 
+const createCase = (description) => {
+    const token = localStorage.getItem('token');
+    return axios.post(API_URL, {description}, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+};
+
 export default {
     getAllCases,
+    createCase,
 };

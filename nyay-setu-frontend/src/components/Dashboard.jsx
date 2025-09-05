@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -12,7 +12,11 @@ const Dashboard = () => {
     return (
         <div>
             <h2>Welcome to the Nyay-Setu Dashboard!</h2>
-            <p>This is a protected area only for logged-in users.</p>
+
+            {/* 2. Add this link */}
+            <Link to="/create-case">File a New Case</Link>
+
+            <br /><br />
             <button onClick={handleLogout}>Logout</button>
         </div>
     );
