@@ -26,10 +26,11 @@ public class EvidenceController {
             "@caseService.findCaseById(#caseId).judge?.email == authentication.name")
 
     public ResponseEntity<?> uploadEvidence(@RequestParam("file") MultipartFile file,
-                                            @RequestParam("caseId") Long caseId) {
+                                           @RequestParam("caseId") Long caseId) {
         try {
-            Evidence savedEvidence = evidenceService.saveEvidence(file, caseId);
-            return new ResponseEntity<>(savedEvidence, HttpStatus.CREATED);
+            // The service now returns an EvidenceDto
+            EvidenceDto savedEvidenceDto = evidenceService.saveEvidence(file, caseId);
+            return new ResponseEntity<>(savedEvidenceDto, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

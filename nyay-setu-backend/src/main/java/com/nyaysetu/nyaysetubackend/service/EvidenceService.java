@@ -42,7 +42,7 @@ public class EvidenceService {
     }
 
     @Transactional
-    public Evidence saveEvidence(MultipartFile file, Long caseId) throws IOException, NoSuchAlgorithmException {
+    public EvidenceDto saveEvidence(MultipartFile file, Long caseId) throws IOException, NoSuchAlgorithmException {
         // 1. Store the file on disk
         String fileName = fileStorageService.storeFile(file);
         // 2. Calculate the file's SHA-256 hash
@@ -65,7 +65,9 @@ public class EvidenceService {
         evidence.setLegalCase(legalCase);
         evidence.setUploadedBy(currentUser);
 
-        return evidenceRepository.save(evidence);
+        Evidence savedEvidence = evidenceRepository.save(evidence);
+
+        return EvidenceDto.fromEntity(savedEvidence);
     }
 }
 
