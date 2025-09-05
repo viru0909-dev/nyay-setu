@@ -19,6 +19,16 @@ const uploadEvidence = (file, caseId) => {
     });
 };
 
+const getEvidenceForCase = (caseId) => {
+    const token = localStorage.getItem('token');
+    return axios.get(`${API_URL}/by-case/${caseId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+};
+
 export default {
     uploadEvidence,
+    getEvidenceForCase,
 };

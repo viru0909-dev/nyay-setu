@@ -44,12 +44,13 @@ const MyCasesComponent = () => {
                         <td>{caseItem.status}</td>
                         <td>{caseItem.description}</td>
                         <td>
-                            <Link to={`/cases/${caseItem.id}/upload`}>
-                                <button>Upload Evidence</button>
+                            <Link to={`/cases/${caseItem.id}`}>
+                                <button>View Details</button>
                             </Link>
                         </td>
                     </tr>
                 ))}
+
                 </tbody>
             </table>
         </div>

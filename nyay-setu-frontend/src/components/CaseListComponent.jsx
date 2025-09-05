@@ -48,8 +48,8 @@ const CaseListComponent = () => {
                         <td>{caseItem.status}</td>
                         <td>
                             {/* 3. Add the Link/Button */}
-                            <Link to={`/cases/${caseItem.id}/upload`}>
-                                <button>Upload Evidence</button>
+                            <Link to={`/cases/${caseItem.id}`}>
+                                <button>View Details</button>
                             </Link>
                         </td>
                     </tr>
