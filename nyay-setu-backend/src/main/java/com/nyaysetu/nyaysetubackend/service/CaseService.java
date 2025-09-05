@@ -3,6 +3,7 @@ package com.nyaysetu.nyaysetubackend.service;
 import com.nyaysetu.nyaysetubackend.dto.CreateCaseRequest;
 import com.nyaysetu.nyaysetubackend.model.Case;
 import com.nyaysetu.nyaysetubackend.model.CaseStatus;
+import com.nyaysetu.nyaysetubackend.model.Role;
 import com.nyaysetu.nyaysetubackend.model.User;
 import com.nyaysetu.nyaysetubackend.repository.CaseRepository;
 import com.nyaysetu.nyaysetubackend.repository.UserRepository;
@@ -69,6 +70,27 @@ public class CaseService {
 
         return caseRepository.save(newCase);
     }
+
+    @Transactional
+    public Case assignLawyerToCase(Long caseId, Long lawyerId) {
+        // 1. Find the case
+        Case theCase = caseRepository.findById(caseId)
+                .orElseThrow(() -> new RuntimeException("Case not found with id: " + caseId));
+
+        // 2. Find the user who is a lawyer
+        User lawyer = userRepository.findById(lawyerId)
+                .orElseThrow(() -> new RuntimeException("Lawyer not found with id: " + lawyerId));
+
+        // 3. Check if the user is actually a lawyer
+        if (lawyer.getRole() != Role.ROLE_LAWYER) {
+            throw new IllegalArgumentException("User with id " + lawyerId + " is not a lawyer.");
+        }
+
+        // 4. Assign the lawyer and save
+        theCase.setLawyer(lawyer);
+        return caseRepository.save(theCase);
+    }
+
 
     public Case findCaseById(Long caseId) {
         return caseRepository.findById(caseId)

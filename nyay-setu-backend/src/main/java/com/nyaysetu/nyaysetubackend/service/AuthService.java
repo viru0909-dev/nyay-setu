@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nyaysetu.nyaysetubackend.dto.LoginRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 @Service
@@ -47,23 +50,28 @@ public class AuthService {
     }
 
     public String login(LoginRequest req) {
-
-        System.out.println("Attempting to authenticate user: " + req.getEmail());
-
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         req.getEmail(),
                         req.getPassword()
                 )
         );
-        // If the above line does not throw an exception, the user is authenticated
+
         var user = userRepository.findByEmail(req.getEmail())
                 .orElseThrow(() -> new IllegalStateException("User not found after auth"));
-        return jwtService.generateToken(
-                org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
-                        .password(user.getPassword())
-                        .authorities(user.getRole().name())
-                        .build()
-        );
+
+        // Create a map for our custom claims
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("fullName", user.getFullName());
+        extraClaims.put("scope", user.getRole().name()); // Let's explicitly put the role in 'scope'
+
+        // Build UserDetails for JWT generation
+        var userDetails = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
+                .password(user.getPassword())
+                .authorities(user.getRole().name())
+                .build();
+
+        // Pass the extra claims to the token generator
+        return jwtService.generateToken(extraClaims, userDetails);
     }
 }

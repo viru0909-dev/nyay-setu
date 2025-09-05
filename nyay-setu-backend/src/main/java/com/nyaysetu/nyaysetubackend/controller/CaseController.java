@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.nyaysetu.nyaysetubackend.dto.AssignLawyerRequest;
 
 import java.util.List;
 
@@ -43,5 +44,12 @@ public class CaseController {
     public ResponseEntity<Case> createCase(@Valid @RequestBody CreateCaseRequest request) {
         Case newCase = caseService.createCase(request);
         return new ResponseEntity<>(newCase, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{caseId}/assign-lawyer")
+    @PreAuthorize("hasRole('JUDGE')")
+    public ResponseEntity<CaseDto> assignLawyer(@PathVariable Long caseId, @Valid @RequestBody AssignLawyerRequest request) {
+        Case updatedCase = caseService.assignLawyerToCase(caseId, request.getLawyerId());
+        return ResponseEntity.ok(CaseDto.fromEntity(updatedCase));
     }
 }
