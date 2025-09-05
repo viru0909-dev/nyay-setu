@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import caseService from '../services/caseService';
+import { Link } from 'react-router-dom';
 
 const CaseListComponent = () => {
     const [cases, setCases] = useState([]);
@@ -35,6 +36,7 @@ const CaseListComponent = () => {
                     <th>Case Number</th>
                     <th>Client Name</th>
                     <th>Status</th>
+                    <th>Actions</th> {/* 2. Add Actions header */}
                 </tr>
                 </thead>
                 <tbody>
@@ -44,6 +46,12 @@ const CaseListComponent = () => {
                         <td>{caseItem.caseNumber}</td>
                         <td>{caseItem.clientName}</td>
                         <td>{caseItem.status}</td>
+                        <td>
+                            {/* 3. Add the Link/Button */}
+                            <Link to={`/cases/${caseItem.id}/upload`}>
+                                <button>Upload Evidence</button>
+                            </Link>
+                        </td>
                     </tr>
                 ))}
                 </tbody>

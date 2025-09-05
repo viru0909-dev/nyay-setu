@@ -6,7 +6,8 @@ import Register from './components/Register.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import CaseListComponent from './components/CaseListComponent.jsx';
-import CreateCaseComponent from './components/CreateCaseComponent.jsx'; // <-- ADD THIS IMPORT LINE
+import CreateCaseComponent from './components/CreateCaseComponent.jsx';
+import EvidenceUploadComponent from './components/EvidenceUploadComponent.jsx';
 
 function App() {
     return (
@@ -16,10 +17,12 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
+
                 <Route element={<ProtectedRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/cases" element={<CaseListComponent />} />
                     <Route path="/create-case" element={<CreateCaseComponent />} />
+                    <Route path="/cases/:caseId/upload" element={<EvidenceUploadComponent />} />
                 </Route>
             </Routes>
         </Router>
