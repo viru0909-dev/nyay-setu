@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.nyaysetu.nyaysetubackend.dto.LoginRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,5 +28,14 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req) {
+        String token = authService.login(req);
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
+
     public record RegistrationResponse(Long id, String email, Object role) {}
+
+    public record AuthResponse(String token) {}
+
 }
