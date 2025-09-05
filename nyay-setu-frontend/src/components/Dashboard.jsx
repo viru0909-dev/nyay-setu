@@ -12,9 +12,8 @@ const Dashboard = () => {
     return (
         <div>
             <h2>Welcome to the Nyay-Setu Dashboard!</h2>
-
-            {/* 2. Add this link */}
-            <Link to="/create-case">File a New Case</Link>
+            <Link to="/create-case" style={{ marginRight: '10px' }}>File a New Case</Link>
+            <Link to="/my-cases">View My Cases</Link> {/* Add this link */}
 
             <br /><br />
             <button onClick={handleLogout}>Logout</button>

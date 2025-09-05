@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import CaseListComponent from './components/CaseListComponent.jsx';
 import CreateCaseComponent from './components/CreateCaseComponent.jsx';
 import EvidenceUploadComponent from './components/EvidenceUploadComponent.jsx';
+import MyCasesComponent from './components/MyCasesComponent.jsx';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                     <Route path="/cases" element={<CaseListComponent />} />
                     <Route path="/create-case" element={<CreateCaseComponent />} />
                     <Route path="/cases/:caseId/upload" element={<EvidenceUploadComponent />} />
+                    <Route path="/my-cases" element={<MyCasesComponent />} />
                 </Route>
             </Routes>
         </Router>

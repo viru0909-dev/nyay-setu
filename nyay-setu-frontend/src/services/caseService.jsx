@@ -28,7 +28,22 @@ const createCase = (description) => {
     });
 };
 
+const getMyCases = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        return Promise.reject("No token found");
+    }
+
+    // Call the new endpoint
+    return axios.get(`${API_URL}/my-cases`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+};
+
 export default {
     getAllCases,
     createCase,
+    getMyCases,
 };
