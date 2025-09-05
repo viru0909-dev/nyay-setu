@@ -36,7 +36,7 @@ const CaseDetailComponent = () => {
             userService.getAllLawyers()
                 .then(response => setLawyers(response.data));
         }
-    }, [caseId, fetchCaseDetails]);
+    }, [caseId, fetchCaseDetails, user]); // Added user to dependency array
 
     const handleAssignLawyer = async () => {
         if (!selectedLawyerId) {
@@ -46,7 +46,7 @@ const CaseDetailComponent = () => {
         try {
             await caseService.assignLawyer(caseId, selectedLawyerId);
             setAssignmentMessage('Lawyer assigned successfully!');
-            fetchCaseDetails(); // Re-fetch case details to update the UI instantly
+            fetchCaseDetails();
         } catch (err) {
             setAssignmentMessage('Failed to assign lawyer.');
         }
@@ -57,14 +57,14 @@ const CaseDetailComponent = () => {
         return Array.isArray(user.role) ? user.role.includes(roleToCheck) : user.role === roleToCheck;
     };
 
-    if (error) return <div style={{ color: 'red' }}><h2>{error}</h2></div>;
-    if (!caseDetails) return <div>Loading case details...</div>;
+    if (error) return <div className="container"><h2 className="error-message">{error}</h2></div>;
+    if (!caseDetails) return <div className="container"><h2>Loading case details...</h2></div>;
 
     return (
-        <div>
+        <div className="container">
             <h2>Case Details: {caseDetails.caseNumber}</h2>
 
-            <div style={{ background: '#eee', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
+            <div className="info-box">
                 <h4>Case Information</h4>
                 <p><strong>Client:</strong> {caseDetails.clientName}</p>
                 <p><strong>Assigned Lawyer:</strong> {caseDetails.lawyerName}</p>
@@ -73,7 +73,7 @@ const CaseDetailComponent = () => {
             </div>
 
             {userHasRole('ROLE_JUDGE') && caseDetails.lawyerName === 'Not Assigned' && (
-                <div style={{ background: '#f0f0f0', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
+                <div className="info-box" style={{borderColor: 'var(--primary-color)'}}>
                     <h4>Assign Lawyer to this Case</h4>
                     <select onChange={(e) => setSelectedLawyerId(e.target.value)}>
                         <option value="">-- Select a Lawyer --</option>
@@ -87,12 +87,37 @@ const CaseDetailComponent = () => {
             )}
 
             <h3>Evidence Locker</h3>
-            <Link to={`/cases/${caseId}/upload`}><button>Upload New Evidence</button></Link>
+            <Link to={`/cases/${caseId}/upload`}>
+                <button style={{marginBottom: '20px'}}>Upload New Evidence</button>
+            </Link>
 
-            {/* Evidence Table */}
-            {/* ... existing evidence table code ... */}
+            {evidenceList.length > 0 ? (
+                <table>
+                    <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>File Type</th>
+                        <th>Uploaded At</th>
+                        <th>SHA-256 Hash</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {evidenceList.map(evidence => (
+                        <tr key={evidence.id}>
+                            <td>{evidence.fileName}</td>
+                            <td>{evidence.fileType}</td>
+                            <td>{new Date(evidence.uploadedAt).toLocaleString()}</td>
+                            <td style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{evidence.sha256Hash}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>No evidence has been uploaded for this case yet.</p>
+            )}
         </div>
     );
 };
 
 export default CaseDetailComponent;
+
