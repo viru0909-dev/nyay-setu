@@ -71,6 +71,8 @@ public class CaseService {
         return caseRepository.save(newCase);
     }
 
+
+
     @Transactional
     public Case assignLawyerToCase(Long caseId, Long lawyerId) {
         // 1. Find the case
@@ -92,8 +94,11 @@ public class CaseService {
     }
 
 
-    public Case findCaseById(Long caseId) {
-        return caseRepository.findById(caseId)
+    @Transactional(readOnly = true) // Add this for performance
+    public CaseDto findCaseById(Long caseId) {
+        Case caseEntity = caseRepository.findById(caseId)
                 .orElseThrow(() -> new RuntimeException("Case not found with id: " + caseId));
+        return CaseDto.fromEntity(caseEntity);
     }
+
 }

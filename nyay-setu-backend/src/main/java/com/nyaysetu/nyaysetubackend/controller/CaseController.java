@@ -39,6 +39,12 @@ public class CaseController {
         return ResponseEntity.ok(cases);
     }
 
+    @GetMapping("/{caseId}")
+    @PreAuthorize("isAuthenticated()") // Any authenticated user can view a case's details
+    public ResponseEntity<CaseDto> getCaseById(@PathVariable Long caseId) {
+        return ResponseEntity.ok(caseService.findCaseById(caseId));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Case> createCase(@Valid @RequestBody CreateCaseRequest request) {
