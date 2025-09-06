@@ -1,26 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import evidenceService from '../services/evidenceService.js';
-import userService from '../services/userService.js';
-import caseService from '../services/caseService.js';
-import hearingService from '../services/hearingService.js';
-import { useAuth } from '../context/AuthContext.js';
+import evidenceService from '../services/evidenceService';
+import userService from '../services/userService';
+import caseService from '../services/caseService';
+import hearingService from '../services/hearingService';
+import { useAuth } from '../context/AuthContext';
 
 const CaseDetailComponent = () => {
     const { user } = useAuth();
     const { caseId } = useParams();
 
+    // State for all data displayed on this page
     const [caseDetails, setCaseDetails] = useState(null);
     const [evidenceList, setEvidenceList] = useState([]);
+    const [hearings, setHearings] = useState([]);
     const [lawyers, setLawyers] = useState([]);
+    const [error, setError] = useState('');
+
+    // State for the assignment form
     const [selectedLawyerId, setSelectedLawyerId] = useState('');
     const [assignmentMessage, setAssignmentMessage] = useState('');
-    const [error, setError] = useState('');
+
+    // State for the hearing form
     const [hearingForm, setHearingForm] = useState({ scheduledAt: '', meetingLink: '', notes: '' });
     const [hearingMessage, setHearingMessage] = useState('');
-    const [hearings, setHearings] = useState([]); // <-- 1. ADD NEW STATE FOR HEARINGS
 
-    // 2. This function will be called to refresh all data on the page
+    // This single function will be used to refresh all data on the page
     const refreshData = useCallback(() => {
         caseService.getCaseById(caseId)
             .then(response => setCaseDetails(response.data))
@@ -28,9 +33,8 @@ const CaseDetailComponent = () => {
 
         evidenceService.getEvidenceForCase(caseId)
             .then(response => setEvidenceList(response.data))
-            .catch(err => setError('Failed to fetch evidence.'));
+            .catch(err => console.error('Failed to fetch evidence.', err));
 
-        // Fetch hearings
         hearingService.getHearingsForCase(caseId)
             .then(response => setHearings(response.data))
             .catch(err => console.error("Failed to fetch hearings", err));
@@ -41,9 +45,9 @@ const CaseDetailComponent = () => {
         return Array.isArray(user.role) ? user.role.includes(roleToCheck) : user.role === roleToCheck;
     };
 
+    // Main effect to load data when the component mounts
     useEffect(() => {
-        refreshData(); // Call the refresh function on component load
-
+        refreshData();
         if (userHasRole('ROLE_JUDGE')) {
             userService.getAllLawyers()
                 .then(response => setLawyers(response.data));
@@ -51,11 +55,14 @@ const CaseDetailComponent = () => {
     }, [caseId, user, refreshData]);
 
     const handleAssignLawyer = async () => {
-        // ... existing function ...
+        if (!selectedLawyerId) {
+            setAssignmentMessage('Please select a lawyer.');
+            return;
+        }
         try {
             await caseService.assignLawyer(caseId, selectedLawyerId);
             setAssignmentMessage('Lawyer assigned successfully!');
-            refreshData(); // Refresh data after assigning
+            refreshData(); // Refresh all data on the page
         } catch (err) {
             setAssignmentMessage('Failed to assign lawyer.');
         }
@@ -74,9 +81,9 @@ const CaseDetailComponent = () => {
             await hearingService.scheduleHearing(hearingData);
             setHearingMessage('Hearing scheduled successfully!');
             setHearingForm({ scheduledAt: '', meetingLink: '', notes: '' });
-            refreshData(); // <-- 3. REFRESH DATA AFTER SCHEDULING
+            refreshData(); // Refresh all data on the page
         } catch (err) {
-            setHearingMessage('Failed to schedule hearing. Please check the details and try again.');
+            setHearingMessage('Failed to schedule hearing. Please check details.');
             console.error(err);
         }
     };
@@ -86,11 +93,75 @@ const CaseDetailComponent = () => {
 
     return (
         <div className="container">
-            {/* ... all existing JSX for case details, assignment, scheduling ... */}
+            <h2>Case Details: {caseDetails.caseNumber}</h2>
+
+            <div className="info-box">
+                <h4>Case Information</h4>
+                <p><strong>Client:</strong> {caseDetails.clientName}</p>
+                <p><strong>Assigned Lawyer:</strong> {caseDetails.lawyerName}</p>
+                <p><strong>Presiding Judge:</strong> {caseDetails.judgeName}</p>
+                <p><strong>Status:</strong> {caseDetails.status}</p>
+            </div>
+
+            {userHasRole('ROLE_JUDGE') && caseDetails.lawyerName === 'Not Assigned' && (
+                <div className="info-box" style={{borderColor: 'var(--primary-color)'}}>
+                    <h4>Assign Lawyer to this Case</h4>
+                    <select onChange={(e) => setSelectedLawyerId(e.target.value)}>
+                        <option value="">-- Select a Lawyer --</option>
+                        {lawyers.map(lawyer => (
+                            <option key={lawyer.id} value={lawyer.id}>{lawyer.fullName}</option>
+                        ))}
+                    </select>
+                    <button onClick={handleAssignLawyer} style={{ marginLeft: '10px' }}>Assign Lawyer</button>
+                    {assignmentMessage && <p>{assignmentMessage}</p>}
+                </div>
+            )}
+
+            {userHasRole('ROLE_JUDGE') && (
+                <div className="info-box" style={{borderColor: 'var(--secondary-color)'}}>
+                    <h4>Schedule a New Hearing</h4>
+                    <form onSubmit={handleScheduleHearing}>
+                        <div>
+                            <label htmlFor="scheduledAt">Date and Time</label>
+                            <input
+                                type="datetime-local"
+                                id="scheduledAt"
+                                name="scheduledAt"
+                                value={hearingForm.scheduledAt}
+                                onChange={handleHearingFormChange}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="meetingLink">Meeting Link (e.g., Google Meet, Jitsi)</label>
+                            <input
+                                type="url"
+                                id="meetingLink"
+                                name="meetingLink"
+                                value={hearingForm.meetingLink}
+                                onChange={handleHearingFormChange}
+                                placeholder="https://meet.google.com/xyz-abc-def"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="notes">Agenda / Notes (Optional)</label>
+                            <textarea
+                                id="notes"
+                                name="notes"
+                                value={hearingForm.notes}
+                                onChange={handleHearingFormChange}
+                                rows="3"
+                            />
+                        </div>
+                        <button type="submit">Schedule Hearing</button>
+                    </form>
+                    {hearingMessage && <p>{hearingMessage}</p>}
+                </div>
+            )}
 
             <hr />
 
-            {/* --- 4. NEW HEARINGS LIST SECTION --- */}
             <h3>Scheduled Hearings</h3>
             {hearings.length > 0 ? (
                 <div className="hearings-list">
@@ -99,9 +170,9 @@ const CaseDetailComponent = () => {
                             <h4>Hearing on: {new Date(hearing.scheduledAt).toLocaleString()}</h4>
                             <p><strong>Agenda/Notes:</strong> {hearing.notes || 'N/A'}</p>
                             <p><strong>Scheduled By:</strong> {hearing.scheduledByJudgeName}</p>
-                            <a href={hearing.meetingLink} target="_blank" rel="noopener noreferrer">
-                                <button>Join Hearing</button>
-                            </a>
+                            <Link to={`/hearings/${hearing.id}`}>
+                                <button>View Courtroom</button>
+                            </Link>
                         </div>
                     ))}
                 </div>
@@ -113,13 +184,19 @@ const CaseDetailComponent = () => {
 
             <h3>Evidence Locker</h3>
             <Link to={`/cases/${caseId}/upload`}>
-                <button style={{ marginBottom: '20px' }}>Upload New Evidence</button>
+                <button style={{marginBottom: '20px'}}>Upload New Evidence</button>
             </Link>
 
-            {/* Existing Evidence Table */}
             {evidenceList.length > 0 ? (
                 <table>
-                    {/* ... table headers ... */}
+                    <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>File Type</th>
+                        <th>Uploaded At</th>
+                        <th>SHA-256 Hash</th>
+                    </tr>
+                    </thead>
                     <tbody>
                     {evidenceList.map(evidence => (
                         <tr key={evidence.id}>
@@ -137,3 +214,5 @@ const CaseDetailComponent = () => {
         </div>
     );
 };
+
+export default CaseDetailComponent;

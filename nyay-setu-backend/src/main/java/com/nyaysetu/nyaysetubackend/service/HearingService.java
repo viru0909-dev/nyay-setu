@@ -63,5 +63,12 @@ public class HearingService {
                 .map(HearingDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public HearingDto findHearingById(Long hearingId) {
+        Hearing hearing = hearingRepository.findById(hearingId)
+                .orElseThrow(() -> new RuntimeException("Hearing not found with id: " + hearingId));
+        return HearingDto.fromEntity(hearing);
+    }
 }
 

@@ -23,10 +23,12 @@ public class CaseService {
 
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public CaseService(CaseRepository caseRepository, UserRepository userRepository) {
+    public CaseService(CaseRepository caseRepository, UserRepository userRepository, NotificationService notificationService) {
         this.caseRepository = caseRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public List<CaseDto> findAllCases() {
@@ -90,7 +92,16 @@ public class CaseService {
 
         // 4. Assign the lawyer and save
         theCase.setLawyer(lawyer);
-        return caseRepository.save(theCase);
+        Case updatedCase = caseRepository.save(theCase);
+        String lawyerMessage = String.format("You have been assigned to a new case: %s.", updatedCase.getCaseNumber());
+        notificationService.createNotification(lawyer, lawyerMessage);
+
+        // Notify the client
+        User client = updatedCase.getClient();
+        String clientMessage = String.format("A lawyer, %s, has been assigned to your case: %s.", lawyer.getFullName(), updatedCase.getCaseNumber());
+        notificationService.createNotification(client, clientMessage);
+
+        return updatedCase;
     }
 
 

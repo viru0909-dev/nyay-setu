@@ -134,3 +134,20 @@ th {
     border-left: 4px solid var(--secondary-color);
 }
 
+/* in src/index.css, add this at the end of the file */
+.join-hearing-button {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.join-hearing-button:hover {
+    background-color: #6a4bff; /* A slightly lighter shade for hover */
+}

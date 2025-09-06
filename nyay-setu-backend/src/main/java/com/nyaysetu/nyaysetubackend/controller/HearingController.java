@@ -34,5 +34,14 @@ public class HearingController {
         HearingDto scheduledHearing = hearingService.scheduleHearing(request);
         return new ResponseEntity<>(scheduledHearing, HttpStatus.CREATED);
     }
+
+
+
+    @GetMapping("/{hearingId}")
+    @PreAuthorize("isAuthenticated()") // Any authenticated user can view a hearing's details
+    public ResponseEntity<HearingDto> getHearingById(@PathVariable Long hearingId) {
+        HearingDto hearing = hearingService.findHearingById(hearingId);
+        return ResponseEntity.ok(hearing);
+    }
 }
 

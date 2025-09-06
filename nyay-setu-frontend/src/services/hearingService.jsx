@@ -21,7 +21,17 @@ const getHearingsForCase = (caseId) => {
     });
 };
 
+const getHearingById = (hearingId) => {
+    const token = localStorage.getItem('token');
+    return axios.get(`${API_URL}/${hearingId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+};
+
 export default {
     scheduleHearing,
     getHearingsForCase,
+    getHearingById,
 };

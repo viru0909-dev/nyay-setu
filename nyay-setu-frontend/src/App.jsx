@@ -10,6 +10,7 @@ import CreateCaseComponent from './components/CreateCaseComponent.jsx';
 import EvidenceUploadComponent from './components/EvidenceUploadComponent.jsx';
 import MyCasesComponent from './components/MyCasesComponent.jsx';
 import CaseDetailComponent from './components/CaseDetailComponent.jsx';
+import VirtualCourtroomComponent from './components/VirtualCourtroomComponent.jsx';
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/cases/:caseId/upload" element={<EvidenceUploadComponent />} />
                     <Route path="/my-cases" element={<MyCasesComponent />} />
                     <Route path="/cases/:caseId" element={<CaseDetailComponent />} />
+                    <Route path="/hearings/:hearingId" element={<VirtualCourtroomComponent />} />
                 </Route>
             </Routes>
         </Router>
