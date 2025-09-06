@@ -9,32 +9,23 @@ import { useAuth } from '../context/AuthContext';
 const CaseDetailComponent = () => {
     const { user } = useAuth();
     const { caseId } = useParams();
-
-    // State for all data displayed on this page
     const [caseDetails, setCaseDetails] = useState(null);
     const [evidenceList, setEvidenceList] = useState([]);
     const [hearings, setHearings] = useState([]);
     const [lawyers, setLawyers] = useState([]);
     const [error, setError] = useState('');
-
-    // State for the assignment form
     const [selectedLawyerId, setSelectedLawyerId] = useState('');
     const [assignmentMessage, setAssignmentMessage] = useState('');
-
-    // State for the hearing form
     const [hearingForm, setHearingForm] = useState({ scheduledAt: '', meetingLink: '', notes: '' });
     const [hearingMessage, setHearingMessage] = useState('');
 
-    // This single function will be used to refresh all data on the page
     const refreshData = useCallback(() => {
         caseService.getCaseById(caseId)
             .then(response => setCaseDetails(response.data))
             .catch(err => setError('Failed to fetch case details.'));
-
         evidenceService.getEvidenceForCase(caseId)
             .then(response => setEvidenceList(response.data))
             .catch(err => console.error('Failed to fetch evidence.', err));
-
         hearingService.getHearingsForCase(caseId)
             .then(response => setHearings(response.data))
             .catch(err => console.error("Failed to fetch hearings", err));
@@ -45,7 +36,6 @@ const CaseDetailComponent = () => {
         return Array.isArray(user.role) ? user.role.includes(roleToCheck) : user.role === roleToCheck;
     };
 
-    // Main effect to load data when the component mounts
     useEffect(() => {
         refreshData();
         if (userHasRole('ROLE_JUDGE')) {
@@ -62,7 +52,7 @@ const CaseDetailComponent = () => {
         try {
             await caseService.assignLawyer(caseId, selectedLawyerId);
             setAssignmentMessage('Lawyer assigned successfully!');
-            refreshData(); // Refresh all data on the page
+            refreshData();
         } catch (err) {
             setAssignmentMessage('Failed to assign lawyer.');
         }
@@ -81,7 +71,7 @@ const CaseDetailComponent = () => {
             await hearingService.scheduleHearing(hearingData);
             setHearingMessage('Hearing scheduled successfully!');
             setHearingForm({ scheduledAt: '', meetingLink: '', notes: '' });
-            refreshData(); // Refresh all data on the page
+            refreshData();
         } catch (err) {
             setHearingMessage('Failed to schedule hearing. Please check details.');
             console.error(err);
@@ -94,7 +84,6 @@ const CaseDetailComponent = () => {
     return (
         <div className="container">
             <h2>Case Details: {caseDetails.caseNumber}</h2>
-
             <div className="info-box">
                 <h4>Case Information</h4>
                 <p><strong>Client:</strong> {caseDetails.clientName}</p>
@@ -133,7 +122,7 @@ const CaseDetailComponent = () => {
                             />
                         </div>
                         <div>
-                            <label htmlFor="meetingLink">Meeting Link (e.g., Google Meet, Jitsi)</label>
+                            <label htmlFor="meetingLink">Meeting Link</label>
                             <input
                                 type="url"
                                 id="meetingLink"

@@ -70,5 +70,7 @@ public class HearingService {
                 .orElseThrow(() -> new RuntimeException("Hearing not found with id: " + hearingId));
         return HearingDto.fromEntity(hearing);
     }
+
+
 }
 
