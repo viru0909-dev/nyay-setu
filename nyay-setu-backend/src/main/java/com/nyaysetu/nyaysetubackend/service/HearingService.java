@@ -12,6 +12,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class HearingService {
 
@@ -49,6 +52,16 @@ public class HearingService {
 
         // Convert to DTO to safely return to the controller
         return HearingDto.fromEntity(savedHearing);
+    }
+
+    @Transactional(readOnly = true)
+    public List<HearingDto> findHearingsByCaseId(Long caseId) {
+        // In a future version, you could add security here to ensure the
+        // requesting user is actually part of this case.
+        return hearingRepository.findByLegalCaseIdOrderByScheduledAtDesc(caseId)
+                .stream()
+                .map(HearingDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }
 
